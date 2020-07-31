@@ -1,56 +1,36 @@
+// *** Moduly
 require('dotenv').config()
-const fetch = require('node-fetch')
+const Game = require('./game')
 const Discord = require('discord.js');
+
+const CHANNEL_ID = '737375048335360132'
 const client = new Discord.Client();
-
-let activeWord
-let active = false
-let score = {}
-
-async function getWord() {
-    return await fetch('http://slova.cetba.eu/generate.php?number=1').then(response => {
-        return response.text()
-    }).then(data => {
-        return data.trim()
-    }).catch(error => {
-        console.error(error)
-    })
-}
+let _game = new Game()
 
 function sendMessage(msg) {
-    client.channels.cache.get('737375048335360132').send(msg)
+    client.channels.cache.get(CHANNEL_ID).send(msg)
 }
 
-async function newWord() {
-    activeWord = await getWord()
-    sendMessage(activeWord.toUpperCase().split('').join(' '))
-    console.log(activeWord)
+function sendWord(word) {
+    sendMessage(word.toUpperCase().split('').join(' '))
 }
-
 
 client.on('ready', async () => {
-    console.log(`Logged in as ${client.user.tag}!`);
-    await newWord()
-    active = true
+    await _game.loadWords()
+    sendWord(_game.nextWord())
 });
 
 client.on('message', async msg => {
     if (msg.channel.name !== 'karel' || msg.author.id == client.user.id) return
-    if (typeof score[msg.author.id] === 'undefined')
-        score[msg.author.id] = {wordCounter: 0, score: 0}
 
-    if (msg.content === activeWord && active) {
-        active = false
+    if (msg.content === '!scr') {
+        let s = _game.getScore(msg.author.id)
+        if (typeof s !== 'undefined' && s.words > 0) msg.reply(`Tvoje score: ${Math.round(s.correct / s.words * 100)}`)
+    } else if (_game.checkWord(msg.content, msg.author.id)) {
+        let word = _game.nextWord()
         msg.reply('Good Job')
-        await newWord()
-        active = true
-        score[msg.author.id].score++
-        score[msg.author.id].wordCounter++
-    } else if (msg.content === '!scr') {
-        let s = score[msg.author.id]
-        if (s.wordCounter > 0) msg.reply(`Tvoje score: ${s.score / s.wordCounter * 100}`)
+        sendWord(word)
     } else {
-        score[msg.author.id].wordCounter++
         msg.delete()
     }
 });
