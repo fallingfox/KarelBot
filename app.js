@@ -1,3 +1,10 @@
+/**
+ * TODO
+ * Persistentní uložení výsledků hráčů (Mongo, SQLite)
+ * Lepší výpis výsledků
+ * Modifikace slov
+ */
+
 // *** Moduly
 require('dotenv').config()
 const Game = require('./game')
