@@ -10,7 +10,7 @@ require('dotenv').config()
 const Game = require('./game')
 const Discord = require('discord.js');
 
-const CHANNEL_ID = '737375048335360132'
+// const CHANNEL_ID = '737375048335360132'
 const client = new Discord.Client();
 let _game = new Game()
 

@@ -1,6 +1,6 @@
 const Players = require('./players')
 const Words = require('./words')
-const WordMods = require('./word_mods')
+// const WordMods = require('./word_mods')
 
 class Game {
     // *** Konstruktor
